@@ -18,8 +18,11 @@ void f_pop(stack_t **stack, unsigned int line_number)
 		exit(EXIT_FAILURE);
 	}
 	temp = *stack;
-	(*stack) = temp->next;
-	free(temp);
+	while (temp)
+	{
+		(*stack) = temp->next;
+		free(temp);
+	}
 }
 
 /**
@@ -33,17 +36,20 @@ void f_swap(stack_t **stack, unsigned int line_number)
 	stack_t *temp;
 
 	temp = *stack;
-	if (temp->next == NULL)
+	while (temp)
 	{
-		fprintf(stderr, "L%d: can't swap, stack too short\n", line_number);
-		free_list(*stack);
-		fclose(globe.file);
-		exit(EXIT_FAILURE);
+		if (temp->next == NULL)
+		{
+			fprintf(stderr, "L%d: can't swap, stack too short\n", line_number);
+			free_list(*stack);
+			fclose(globe.file);
+			exit(EXIT_FAILURE);
+		}
+		*stack = temp->next;
+		temp->next = (*stack)->next;
+		temp->prev = (*stack);
+		(*stack)->next = temp;
 	}
-	*stack = temp->next;
-	temp->next = (*stack)->next;
-	temp->prev = (*stack);
-	(*stack)->next = temp;
 }
 
 /**
@@ -64,9 +70,9 @@ void f_add(stack_t **stack, unsigned int line_number)
 		exit(EXIT_FAILURE);
 	}
 	add = *stack;
-	*stack = add->next;
-	res = (add->n) + ((*stack)->n);
-	(*stack)->n = res;
+	res = (add->n) + (add->next->n);
+	add->next->n = res;
+	(*stack) = add->next;
 	free(add);
 
 }
